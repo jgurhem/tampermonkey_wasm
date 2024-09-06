@@ -20,14 +20,43 @@ jobs:
       run: cargo install wasm-pack
     - name: Build
       run: wasm-pack build --target web
-    - run: echo ${{ github.event.release }}
-    - run: echo ${{ github.event }}
-    - run: |
-        gh api \
-          --method POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          -H "Content-Type: application/json" \
-          --hostname HOSTNAME \
-          ${{ github.event.release.upload_url }}?name=package.json \
-          -f "@pkg/package.json"
+    - uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./pkg/package.json
+        asset_name: package.json
+        asset_content_type: application/json
+    - uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./pkg/tampermonky_wasm.d.ts
+        asset_name: tampermonky_wasm.d.ts
+        asset_content_type: text/javascript
+    - uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./pkg/tampermonky_wasm.js
+        asset_name: tampermonky_wasm.js
+        asset_content_type: text/javascript
+    - uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./pkg/tampermonky_wasm_bg.wasm
+        asset_name: tampermonky_wasm_bg.wasm
+        asset_content_type: application/wasm
+    - uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./pkg/tampermonky_wasm_bg.wasm.d.ts
+        asset_name: tampermonky_wasm_bg.wasm.d.ts
+        asset_content_type: text/javascript
