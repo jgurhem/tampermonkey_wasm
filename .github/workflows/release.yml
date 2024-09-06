@@ -22,10 +22,12 @@ jobs:
       run: wasm-pack build --target web
     - run: echo ${{ github.event.release }}
     - run: echo ${{ github.event }}
-    - uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./pkg/package.json
-        asset_name: package.json
+    - run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          -H "Content-Type: application/json" \
+          --hostname HOSTNAME \
+          ${{ github.event.release.upload_url }}?name=package.json \
+          -f "@pkg/package.json"
