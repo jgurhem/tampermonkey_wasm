@@ -1,0 +1,26 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  release:
+    types: [published]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  web-pack:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: git status
+    - name: install wasm-pack
+      run: cargo install wasm-pack
+    - name: Build
+      run: wasm-pack build --target web
+    - uses: actions/upload-artifact@v4
+      with:
+        name: wasm
+        path: pkg
