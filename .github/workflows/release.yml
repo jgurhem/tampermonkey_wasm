@@ -19,7 +19,7 @@ jobs:
     - name: install wasm-pack
       run: cargo install wasm-pack
     - name: Build
-      run: wasm-pack build --target web
+      run: wasm-pack build
     - uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
