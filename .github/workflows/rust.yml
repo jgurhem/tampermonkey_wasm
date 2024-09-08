@@ -28,4 +28,4 @@ jobs:
     - name: install wasm-pack
       run: cargo install wasm-pack
     - name: Build
-      run: wasm-pack build
+      run: wasm-pack build --target no-module
