@@ -16,8 +16,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - run: git status
-    - name: install wasm-pack
-      run: cargo install wasm-pack
+    - name: Add target
+      run: rustup target add wasm32-unknown-unknown
     - name: cargo build
       run: cargo build --release --target wasm32-unknown-unknown
     - uses: actions/upload-release-asset@v1
@@ -29,6 +29,8 @@ jobs:
         asset_name: tampermonky_wasm.wasm
         asset_content_type: application/wasm
 
+    - name: install wasm-pack
+      run: cargo install wasm-pack
     - name: wasm-pack build
       run: wasm-pack build --target no-modules
     - uses: actions/upload-release-asset@v1
