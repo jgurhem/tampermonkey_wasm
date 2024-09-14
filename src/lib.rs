@@ -27,6 +27,14 @@ impl Fraction {
         self.num = self.num * other.den + other.num * self.den;
         self.den = other.den * tmp;
     }
+
+    pub fn add2(lhs: Fraction, rhs: Fraction) -> Fraction {
+        Fraction{num: lhs.num * rhs.den + rhs.num * lhs.den, den: rhs.den * lhs.den}
+    }
+
+    pub fn print(f: Fraction) -> String {
+        format!("{}/{}", f.num, f.den)
+    }
 }
 
 impl Add for Fraction {
