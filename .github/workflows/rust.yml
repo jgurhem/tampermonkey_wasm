@@ -21,6 +21,15 @@ jobs:
     - name: Build release package
       run: cargo build --release
 
+  build-wasm:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      run: rustup target add wasm32-unknown-unknown
+    - name: Build
+      run: cargo build --release --target wasm32-unknown-unknown
+
   web-pack:
     runs-on: ubuntu-latest
     steps:
