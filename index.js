@@ -1,11 +1,10 @@
 // ==UserScript==
-// @name         Load Some WASM
+// @name         RustAddition
 // @namespace    http://tampermonkey.net/
-// @version      0.0.9
-// @description  Example to load WASM file and execute its functions from Tampermonkey user script
+// @version      0.0.11
+// @description  Example to load WASM file compiled from Rust and execute its functions in a GreasyFork/Tampermonkey user script
 // @author       Jérôme Gurhem (https://github.com/jgurhem)
 // @match        https://www.google.fr/**
-// @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
 // @grant        GM_xmlhttpRequest
 // @connect      github.com
 // @connect      objects.githubusercontent.com
@@ -14,7 +13,7 @@
 (async function () {
     const r = await GM.xmlHttpRequest({
         method: "GET",
-        url: "https://github.com/jgurhem/tampermonkey_wasm/releases/download/0.0.9/tampermonky_wasm_bg.wasm",
+        url: "https://github.com/jgurhem/tampermonkey_wasm/releases/download/0.0.11/tampermonky_wasm_bg.wasm",
         headers: {
             "Content-Type": "application/wasm"
         },
