@@ -18,7 +18,18 @@ jobs:
     - run: git status
     - name: install wasm-pack
       run: cargo install wasm-pack
-    - name: Build
+    - name: cargo build
+      run: cargo build --release --target wasm32-unknown-unknown
+    - uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./target/wasm32-unknown-unknown/release/tampermonky_wasm.wasm
+        asset_name: tampermonky_wasm.wasm
+        asset_content_type: application/wasm
+
+    - name: wasm-pack build
       run: wasm-pack build --target no-modules
     - uses: actions/upload-release-asset@v1
       env:
