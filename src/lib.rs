@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::{ops::Add, fmt::Display};
 
 use wasm_bindgen::prelude::*;
 
@@ -27,12 +27,14 @@ impl Fraction {
         self.den = other.den * self.den;
     }
 
-    pub fn add2(lhs: Fraction, rhs: Fraction) -> Fraction {
-        Fraction{num: lhs.num * rhs.den + rhs.num * lhs.den, den: rhs.den * lhs.den}
+    pub fn to_string(&self) -> String {
+        format!("{}/{}", self.num, self.den)
     }
+}
 
-    pub fn print(f: Fraction) -> String {
-        format!("{}/{}", f.num, f.den)
+impl Display for Fraction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}", self.num, self.den)
     }
 }
 
