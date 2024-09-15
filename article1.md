@@ -75,6 +75,7 @@ wasm-pack --target no-modules
 
 The option `--target no-modules` making sure that there is no import to modules that are not allowed within userscripts.
 Our WebAssembly is available at `./pkg/addition_bg.wasm`.
+`wasm-pack` also produces Javascript helper code that will help load and instantiate the WebAssembly and offers Javascript bindings around the code within the assembly.
 
 ## A GitHub Action
 
@@ -130,6 +131,15 @@ jobs:
         asset_path: ./pkg/addition_bg.wasm
         asset_name: addition_bg.wasm
         asset_content_type: application/wasm
+    # Javascript code that will help load the WebAssembly and easily access its features
+    - uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./pkg/tampermonky_wasm.js
+        asset_name: tampermonky_wasm.js
+        asset_content_type: text/javascript
 ```
 
 Then, you will have to create a [GitHub release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release) so that the WebAssembly can be made available.
@@ -150,33 +160,40 @@ Let's start with the header:
 // @grant        GM_xmlhttpRequest
 // @connect      github.com
 // @connect      objects.githubusercontent.com
+// @require      https://github.com/jgurhem/tampermonkey_wasm/releases/download/0.0.11/tampermonky_wasm.js
 // ==/UserScript==
 ```
 
 We give it the all the information it needs so that we can find our script.
-Note that there are two things to take into account:
+Note that there are a few things to take into account:
 
 - We need to add `@grant GM_xmlhttpRequest` to be able to download our WebAssembly from the script.
 - We also need to give the domain that will be accessed by the script through the `@connect`. Here it is `github.com` to access our release. Keep in mind that the release redirects to `objects.githubusercontent.com` so we need to add it too.
+- The `@require` allows to include the Javascript helper code to load our WebAssembly into the userscript.
 
 Then, here is the Javascript code that downloads the WebAssembly from our release and instantiate it so that we can use it from our userscript:
 
 ```js
 (async function () {
+    // we download the WebAssembly we released previously
     const r = await GM.xmlHttpRequest({
         url: "https://github.com/jgurhem/tampermonkey_wasm/releases/download/0.0.11/tampermonky_wasm_bg.wasm",
         responseType: "arraybuffer",
     }).catch(e => console.error(e));
 
-    const module = await WebAssembly.compile(r.response);
-    const instance = new WebAssembly.Instance(module, {});
-    const add = instance.exports.add;
+    // use wasm-pack functions to load our WebAssembly
+    // is pasted in the userscript by the @require
+    const { add } = wasm_bindgen;
+    await wasm_bindgen(r.response);
+
+    // call the add function
     console.log(add(1, 3));
 })();
 ```
 
-After downloading the assembly, we instantiate it and extract the `add` method from the exports of the instantited module.
-Then, we use it !
+After downloading the assembly, we pass it to the helper function.
+It will instantiate it and gives us access to our `add` function.
+Then, we can use it !
 You can open [https://www.google.com/](https://www.google.com/) with the developper tools activated and see in the console that the result of our addition, `4`, is printed.
 
 In this post, you learned how to build a WebAssembly compiled from Rust code that can be loaded within a Tampermonkey userscript.
@@ -192,3 +209,6 @@ rustup target add wasm32-unknown-unknown
 
 2. Dependencies on `sys-js` crate does not produce a WebAssembly that can be load.
 For more details, see [this issue](https://github.com/rustwasm/wasm-bindgen/issues/2795)
+
+3. `wasm-bindgen` does not support to transform Rust trait implementation into WebAssembly.
+Therefore, traits should be wrapped in functions `wasm-bindgen` can convert.
