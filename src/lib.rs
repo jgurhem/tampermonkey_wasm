@@ -23,9 +23,8 @@ impl Fraction {
     }
 
     pub fn add(&mut self, other: Fraction) {
-        let tmp = self.num;
         self.num = self.num * other.den + other.num * self.den;
-        self.den = other.den * tmp;
+        self.den = other.den * self.den;
     }
 
     pub fn add2(lhs: Fraction, rhs: Fraction) -> Fraction {
