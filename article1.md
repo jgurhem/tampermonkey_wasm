@@ -4,13 +4,13 @@ User scripts which can be added to the web brower to enhance its usage or the we
 What if we want high performances for the features added or use another programming language to implement them ?
 Then we would like to build our code into an intermediate that fit our requirements and that can be used in our GreasyFork userscripts.
 
-Well, WebAssembly was designed for to solve such problems !
-Now, we need to build an application into WebAssembly and load it from our userscript.
+Well, WebAssembly was designed to solve such problems !
+It is now possible to build an application into WebAssembly and load it from our userscript.
 
 ## Rust example to build into a WebAssembly
 
-Let's take a small example we will build into a WebAssembly and load it from our userscript.
-I choose the add function that adds 2 integers in Rust.
+Let's take a small example, build it into a WebAssembly and load it from our userscript.
+I choosed to implement the add function that adds 2 integers in Rust.
 
 Let's create our Rust project.
 If you are not familiar with Rust, you can take a look at ["The Book"](https://doc.rust-lang.org/stable/book/title-page.html) or the [documentation](https://www.rust-lang.org/learn).
@@ -29,9 +29,9 @@ pub fn add(a: u32, b: u32) -> u32 {
 
 This code should be added in `src/lib.rs`.
 
-Now, we need to make it into a WebAssembly.
+Now, we need to convert it into a WebAssembly.
 For that, we need to use the `wasm-bindgen` crate.
-This crate will allow us to compile our Rust code into assembly and call it from Javascript.
+This crate will allow us to compile our Rust code into an assembly that can be call it from Javascript.
 It also allows to import Javascript values into Rust and pass data between Rust and Javascript.
 So let's add it into our dependencies.
 
@@ -57,7 +57,7 @@ Finally, we can build it into a WebAssembly with the following command:
 cargo build --release --target wasm32-unknown-unknown
 ```
 
-Unfortunately, this WebAssembly cannot be loaded into our brower as it depends on modules because modules cannot be instantiated !
+Unfortunately, this WebAssembly cannot be loaded yet into our brower as it depends on other modules because modules cannot be instantiated !
 Here, we can use `wasm-pack` to build our WebAssembly without dependencies to modules.
 
 First, we need to install `wasm-pack`.
@@ -73,7 +73,7 @@ Then, we need to build our project with it:
 wasm-pack --target no-modules
 ```
 
-The option `--target no-modules` making sure that there is no import to modules that are not allowed within userscripts.
+The option `--target no-modules` makes sure that there are no imports to modules which are not allowed within userscripts.
 Our WebAssembly is available at `./pkg/addition_bg.wasm`.
 `wasm-pack` also produces Javascript helper code that will help load and instantiate the WebAssembly and offers Javascript bindings around the code within the assembly.
 
@@ -164,14 +164,14 @@ Let's start with the header:
 // ==/UserScript==
 ```
 
-We give it the all the information it needs so that we can find our script.
+Here, we are giving all the information Tampermonkey and GreasyFork need so that it can find our script.
 Note that there are a few things to take into account:
 
 - We need to add `@grant GM_xmlhttpRequest` to be able to download our WebAssembly from the script.
 - We also need to give the domain that will be accessed by the script through the `@connect`. Here it is `github.com` to access our release. Keep in mind that the release redirects to `objects.githubusercontent.com` so we need to add it too.
 - The `@require` allows to include the Javascript helper code to load our WebAssembly into the userscript.
 
-Then, here is the Javascript code that downloads the WebAssembly from our release and instantiate it so that we can use it from our userscript:
+The following Javascript code download the WebAssembly from our release and instantiate it to be able to use our userscript:
 
 ```js
 (async function () {
@@ -191,7 +191,7 @@ Then, here is the Javascript code that downloads the WebAssembly from our releas
 })();
 ```
 
-After downloading the assembly, we pass it to the helper function.
+After downloading the assembly, we are transferring it to the helper function.
 It will instantiate it and gives us access to our `add` function.
 Then, we can use it !
 You can open [https://www.google.com/](https://www.google.com/) with the developper tools activated and see in the console that the result of our addition, `4`, is printed.
